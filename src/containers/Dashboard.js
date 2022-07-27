@@ -86,9 +86,9 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    console.log(this.id)
+    /*console.log(this.id)
     console.log(this.counter)
-    console.log(bill.id)
+    console.log(bill.id)*/
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0/*$(`#open-bill${b.id}`).attr('style') === "background: rgb(13, 90, 229);" || $(`#open-bill${b.id}`).attr('style')=== undefined */) {
@@ -135,18 +135,18 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    //if (this.counter === undefined || this.index !== index) this.counter = 0
+    if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
-    if (/*this.counter % 2 === 0*/$(`#arrow-icon${this.index}`).attr('style')=== undefined || $(`#arrow-icon${this.index}`).attr('style')=== "transform: rotate(90deg);") {
+    if (this.counter % 2 === 0/*$(`#arrow-icon${this.index}`).attr('style')=== undefined || $(`#arrow-icon${this.index}`).attr('style')=== "transform: rotate(90deg);"*/) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${this.index}`)
         .html(cards(filteredBills(bills, getStatus(this.index))))
-      //this.counter ++
+      this.counter ++
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
         .html("")
-      //this.counter ++
+      this.counter ++
     }
 
     bills.forEach(bill => {
