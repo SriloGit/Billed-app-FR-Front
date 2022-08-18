@@ -1,5 +1,5 @@
 import { ROUTES_PATH } from '../constants/routes.js'
-import { formatDate, formatStatus } from "../app/format.js"
+import { formatDate, formatStatus, formatDateInISO8601 } from "../app/format.js"
 import Logout from "./Logout.js"
 
 export default class {
@@ -38,8 +38,9 @@ export default class {
             try {
               return {
                 ...doc,
-                date: formatDate(doc.date),
-                status: formatStatus(doc.status)
+                formattedDate: formatDate(doc.date),
+                ISODate: formatDateInISO8601(doc.date),
+                status: formatStatus(doc.status),
               }
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function

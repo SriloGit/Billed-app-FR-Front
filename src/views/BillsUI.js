@@ -4,7 +4,7 @@ import LoadingPage from "./LoadingPage.js"
 
 import Actions from './Actions.js'
 
-const row = (bill) => {
+/*const row = (bill) => {
   return (`
     <tr>
       <td>${bill.type}</td>
@@ -21,12 +21,45 @@ const row = (bill) => {
 
 const rows = (data) => {
   return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+}*/
+
+const row = (bill) => {
+	return `
+    <tr>
+      <td>${bill.type}</td>
+      <td>${bill.name}</td>
+      <td>${bill.hasOwnProperty("formattedDate") ? bill.formattedDate : bill.date}</td>
+      <td>${bill.amount} €</td>
+      <td>${bill.status}</td>
+      <td>
+        ${Actions(bill.fileUrl)}
+      </td>
+    </tr>
+    `
+}
+
+const rows = (data) => {
+	if(data && data.length) {
+    const billsSorted = data.filter(invalidBills).sort(antiChrono)
+    return billsSorted.map((bill) => row(bill)).join("")
+  } else {
+    return ""
+  }
+}
+
+const invalidBills = (bill) => (bill.date === null ? false : true)
+
+const antiChrono = (a, b) => {
+  const currentDate = a.hasOwnProperty("ISODate") ? a.ISODate : a.date
+  const nextDate = b.hasOwnProperty("ISODate") ? b.ISODate : b.date
+
+  return (currentDate < nextDate ? 1 : (currentDate > nextDate) ? -1 : 0)
 }
 
 export default ({ data: bills, loading, error }) => {
   
   const modal = () => (`
-    <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" data-testid="modalFile" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
