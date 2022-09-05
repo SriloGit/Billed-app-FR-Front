@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
- import { screen, waitFor } from '@testing-library/dom'
+ import { fireEvent, screen, waitFor } from '@testing-library/dom'
  import '@testing-library/jest-dom'
  import NewBillUI from '../views/NewBillUI.js'
  import NewBill from '../containers/NewBill.js'
@@ -40,46 +40,44 @@ describe("Given I am connected as an employee", () => {
   })
 
   describe('When I am on NewBill page and I upload a file with an extension other than jpg, jpeg or png', () => {
-    test('Then an error message for the file input should be displayed', async() => {
+    test('Then an error message for the file input should be displayed', () => {
       document.body.innerHTML = NewBillUI()
 
       const newBill = new NewBill({
         document,
         onNavigate,
-        store: null,
-        bills: bills,
+        store: mockStore,
         localStorage: window.localStorage,
       })
 
       const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
 
       const fileInput = screen.getByTestId('file')
-      fileInput.addEventListener('click', handleChangeFile)
-      const file =  new File(["hello"], "hello.pdf", { type: "application/pdf" });
-      await waitFor(() => userEvent.upload(fileInput, file))
+      fileInput.addEventListener('change', handleChangeFile)
+      const file =  new File(["hello"], "hello.pdf", { type: "application/pdf" })
+      userEvent.upload(fileInput, file)
       
       expect(handleChangeFile).toHaveBeenCalled()
       const errorMessage = screen.getByTestId('formFile')
       const dataErrorMessage = errorMessage.getAttribute('data-error-visible')
       expect(dataErrorMessage).toEqual('true')
     })
-    test('Then no error message for the file input should be displayed', async() => {
+    test('Then no error message for the file input should be displayed', () => {
       document.body.innerHTML = NewBillUI()
 
       const newBill = new NewBill({
         document,
         onNavigate,
-        store: null,
-        bills: bills,
+        store: mockStore,
         localStorage: window.localStorage,
       })
 
       const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
 
       const fileInput = screen.getByTestId('file')
-      fileInput.addEventListener('click', handleChangeFile)
-      const file =  new File(["hello"], "hello.jpg", { type: "image/jpeg" });
-      await waitFor(() => userEvent.upload(fileInput, file))
+      fileInput.addEventListener('change', handleChangeFile)
+      const file =  new File(["hello"], "hello.jpg", { type: "image/jpeg" })
+      userEvent.upload(fileInput, file)
       
       expect(handleChangeFile).toHaveBeenCalled()
       const errorMessage = screen.getByTestId('formFile')
@@ -88,28 +86,59 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe('When I am on NewBill page, I filled in the form correctly and I clicked on submit button', () => {
-    test('Then Bills page should be rendered', async() => {
+    test('Then a new bill should be created',()  => {
+      document.body.innerHTML = ''
+      
       document.body.innerHTML = NewBillUI()
 
       const newBills = new NewBill({
         document,
         onNavigate,
-        store: null,
+        store: mockStore,
         localStorage: window.localStorage,
       })
-
-      $.fn.modal = jest.fn()
+      
+      const handleChangeFile = jest.fn((e) => newBills.handleChangeFile(e))
       const handleSubmit = jest.fn((e) => newBills.handleSubmit(e))
-      newBills.fileName = 'test.jpg'
+
+      const fileInput = screen.getByTestId('file')
+      fileInput.addEventListener('change', handleChangeFile)
+      const file =  new File(["hello"], "hello.jpg", { type: "image/jpeg" })
+      userEvent.upload(fileInput, file)
+      
+      const newBill = ({
+      type: 'Transports',
+      name:  'test99',
+      amount: '129',
+      date:  '05 Aoû. 2020',
+      vat: 20,
+      pct: 30,
+      commentary: 'Ceci est un test',
+      })
+      
+      const typeNewBill = screen.getByTestId('expense-type')
+      const nameNewBill = screen.getByTestId('expense-name')
+      const amountNewBill = screen.getByTestId('amount')
+      const dateNewBill = screen.getByTestId('datepicker')
+      const vatNewBill = screen.getByTestId('vat')
+      const pctNewBill = screen.getByTestId('pct')
+      const commNewBill = screen.getByTestId('commentary')
+
+      fireEvent.change(typeNewBill, {target: { value: newBill.type }})
+      fireEvent.change(nameNewBill, {target: { value: newBill.name }})
+      fireEvent.change(amountNewBill, {target: { value: newBill.amount }})
+      fireEvent.change(dateNewBill, {target: { value: newBill.date }})
+      fireEvent.change(vatNewBill, {target: { value: newBill.vat }})
+      fireEvent.change(pctNewBill, {target: { value: newBill.pct }})
+      fireEvent.change(commNewBill, {target: { value: newBill.commentary }})
+      
+      expect(handleChangeFile).toHaveBeenCalled()
 
       const formNewBill = screen.getByTestId('form-new-bill')
-      formNewBill.addEventListener('click', handleSubmit)
-
-      await waitFor(() => userEvent.click(formNewBill))
+      formNewBill.addEventListener('submit', handleSubmit)
+      fireEvent.submit(formNewBill)
 
       expect(handleSubmit).toHaveBeenCalled()
-
-      expect(screen.getByText('Mes notes de frais')).toBeTruthy()
     })
   })
 })

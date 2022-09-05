@@ -19,9 +19,9 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]    
+    const fileName = filePath[filePath.length-1]
     const fileDOM = this.document.querySelector(`.formFile`)
-    if(fileName.includes("jpg") === true || fileName.includes("jpeg") === true || fileName.includes("png") === true){
+    if(file.type.includes("jpg") === true || file.type.includes("jpeg") === true || file.type.includes("png") === true){
       const formData = new FormData()
       const email = JSON.parse(localStorage.getItem("user")).email
       formData.append('file', file)
@@ -36,7 +36,6 @@ export default class NewBill {
           }
         })
         .then(({fileUrl, key}) => {
-          console.log(fileUrl)
           this.billId = key
           this.fileUrl = fileUrl
           this.fileName = fileName

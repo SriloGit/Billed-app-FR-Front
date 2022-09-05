@@ -57,7 +57,6 @@ describe("Given I am connected as an employee", () => {
         document,
         onNavigate,
         store: null,
-        bills: bills,
         localStorage: window.localStorage,
       })
       document.body.innerHTML = BillsUI({ data: bills })
@@ -86,28 +85,24 @@ describe("Given I am connected as an employee", () => {
         document,
         onNavigate,
         store: null,
-        bills: bills,
         localStorage: window.localStorage,
       })
       document.body.innerHTML = BillsUI({ data: bills })
 
-      $.fn.modal = jest.fn()
-      const spy = jest.spyOn(newBills, 'handleClickIconEye')
-      const iconEyeList = screen.getAllByTestId('icon-eye')
-      const iconEye = iconEyeList[0]
-      userEvent.click(iconEye)
+      $.fn.modal = jest.fn();
+
+      const iconEyeList = screen.getAllByTestId('icon-eye');
+      let icon1 = iconEyeList[0];
+      const spy = jest.fn((e) => newBills.handleClickIconEye(icon1))
+      
+      if (iconEyeList) {
+        icon1.addEventListener('click', spy);
+        userEvent.click(icon1);
+      }
+      
       expect(spy).toHaveBeenCalled()
       const modale = screen.getByTestId('modalFile')
       expect(modale).toBeTruthy()
-      /*const handleClickIconEye = jest.fn((icon) => newBills.handleClickIconEye(icon))
-      const iconEyeList = screen.getAllByTestId('icon-eye')
-      const iconEye = iconEyeList[0]
-      iconEye.addEventListener("click", handleClickIconEye(iconEye))
-      userEvent.click(iconEye)
-      expect(handleClickIconEye).toHaveBeenCalled()
-
-      const modal = screen.getByTestId('modalFile')
-      expect(modal).toBeTruthy()*/
     })
   })
 })
