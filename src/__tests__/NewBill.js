@@ -141,4 +141,103 @@ describe("Given I am connected as an employee", () => {
       expect(handleSubmit).toHaveBeenCalled()
     })
   })
+  describe('When an error occurs on API', () => {
+    beforeEach(() => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem(
+        'user',
+        JSON.stringify({
+          type: 'Employee',
+          email: 'a@a',
+        })
+      )
+
+      document.body.innerHTML = NewBillUI()
+    })
+
+    test('Then new bill are added to the API but fetch fails with 404 message error', async () => {
+      const spyedMockStore = jest.spyOn(mockStore, 'bills')
+
+      spyedMockStore.mockImplementationOnce(() => {
+        return {
+          create: jest.fn().mockRejectedValue(new Error('Erreur 404')),
+        }
+      })
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname, data: bills })
+      }
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+
+      const fileInput = screen.getByTestId('file')
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.jpg', {
+              type: 'image/jpeg',
+            }),
+          ],
+        },
+      })
+
+      await spyedMockStore()
+
+      expect(spyedMockStore).toHaveBeenCalled()
+
+      expect(newBill.billId).toBeNull()
+      expect(newBill.fileUrl).toBeNull()
+
+      spyedMockStore.mockReset()
+      spyedMockStore.mockRestore()
+    })
+
+    test('Then new bill are added to the API but fetch fails with 500 message error', async () => {
+      const spyedMockStore = jest.spyOn(mockStore, 'bills')
+
+      spyedMockStore.mockImplementationOnce(() => {
+        return {
+          create: jest.fn().mockRejectedValue(new Error('Erreur 500')),
+        }
+      })
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname, data: bills })
+      }
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+
+      const fileInput = screen.getByTestId('file')
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.jpg', {
+              type: 'image/jpeg',
+            }),
+          ],
+        },
+      })
+
+      await spyedMockStore()
+
+      expect(spyedMockStore).toHaveBeenCalled()
+
+      expect(newBill.billId).toBeNull()
+      expect(newBill.fileUrl).toBeNull()
+    })
+  })
 })
